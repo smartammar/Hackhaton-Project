@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { loggin } from "../firebase";
 import { signInWithPopup, FacebookAuthProvider } from "firebase/auth";
 import { authentication } from "../firebase";

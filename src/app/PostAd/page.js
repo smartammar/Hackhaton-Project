@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
+import Swal from 'sweetalert2'
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 import { IoImagesSharp } from "react-icons/io5";
-import Dashboard from "../dashboard/page";
-
+import { useRouter } from "next/navigation";
 import { postAd } from "../firebase";
 
 export default function PostAd() {
+  const router = useRouter();
   const [user, setUser] = useState("");
   const [file, setfile] = useState();
   const [title, setTitle] = useState();
@@ -30,22 +31,26 @@ export default function PostAd() {
   let placeholder = `What's on your mind ${user.displayName}`;
 
   const addData = () => {
+    Swal.fire("Ad Posted Succesfully")
     postAd(title, file[0]);
-  };
+    router.push("/dashboard",{scroll: false})  
+};
 
   return (
+<div className="bg-img">
     <div>
-        <Dashboard />
+    <div className="Signin-card12">
       <br />
       <div>
         <div>
           <textarea
+            className="text-style"
             placeholder={placeholder}
             onChange={(e) => setTitle(e.target.value)}
           ></textarea>
         </div>
 
-        <div>
+        <div className="label-style">
           <label htmlFor="fileUpload" className="custom-file-upload">
             <IoImagesSharp />
           </label>
@@ -58,10 +63,12 @@ export default function PostAd() {
           />
         </div>
         <br />
-        <button onClick={addData} style={{ border: "2px solid black" }}>
+        <button onClick={addData} className="btn-s">
           Post
         </button>
       </div>
     </div>
+    </div>
+</div>
   );
 }

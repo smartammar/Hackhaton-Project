@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { registered } from "../firebase";
+import { IoImagesSharp } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 export default function register() {
   const router = useRouter();
@@ -10,11 +12,11 @@ export default function register() {
   const [password, setPassword] = useState("");
   const [fullname, setFullname] = useState("");
   const [age, setAge] = useState("");
+  const [file, setfile] = useState();
 
   const signUp = async () => {
     try {
-      await registered(email, password, fullname, age);
-      alert("Sign Up Succesfully");
+      await registered(email, password, fullname, age, file[0]);
       router.push("/login", { scroll: false });
     } catch (e) {
       alert(e.message);
@@ -80,6 +82,19 @@ export default function register() {
         type="password"
         placeholder="Password "
       />
+      <br/>
+      <br/>
+          <label htmlFor="fileUpload" className="custom-file-upload">
+            <IoImagesSharp />
+          </label>
+
+          <input
+            onChange={(e) => setfile(e.target.files)}
+            type="file"
+            id="fileUpload"
+            style={{ display: "none", cursor: "pointer" }}
+          />
+
       <div style={{ display: "flex" }}>
         <button className="style-btns2" onClick={signUp}>
           Sign Up

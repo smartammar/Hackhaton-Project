@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
+  signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -29,39 +30,8 @@ export const authentication = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-async function registered(email, password, fullname, age) {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const docRef = await addDoc(collection(db, "users", ""), {
-      fullname: fullname,
-      email: email,
-      age: age,
-    });
-    alert("Successfully Registered!");
-  } catch (e) {
-    alert(e.message);
-  }
-}
-
 function loggin(email, password) {
   return signInWithEmailAndPassword(auth, email, password);
-}
-
-async function postAd(title, image) {
-  try {
-    const url = await uploadImage(image);
-    await addDoc(collection(db, "ads"), {
-      title,
-      imageUrl: url,
-    });
-    alert("Ad Posted Succesfully");
-  } catch (e) {
-    alert(e.message);
-  }
 }
 
 async function uploadImage(image) {
@@ -76,6 +46,50 @@ async function uploadImage(image) {
   }
 }
 
+
+async function UploadProfileImg(image){
+  try {
+    const storageRef = ref(storage, "users/" + image.name);
+    await uploadBytes(storageRef, image);
+    const Url = await getDownloadURL(storageRef);
+
+    return Url;
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function postAd(title, image) {
+  try {
+    const url = await uploadImage(image);
+    await addDoc(collection(db, "ads"), {
+      title,
+      imageUrl: url,
+    });
+  } catch (e) {
+    alert(e.message);
+  }
+}
+async function registered(email, password, fullname, age, image) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const Url = await UploadProfileImg(image);
+    await addDoc(collection(db, "users", ""), {
+      fullname: fullname,
+      email: email,
+      age: age,
+      imageUrl: Url,
+    });
+    alert("Successfully Registered!");
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
 async function getAds() {
   const querySnapshot = await getDocs(collection(db, "ads"));
   const ads = [];
@@ -85,4 +99,17 @@ async function getAds() {
   return ads;
 }
 
-export { getAds, postAd, loggin, registered };
+async function getUser() {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  const users = [];
+  querySnapshot.forEach((doc) => {
+    users.push(doc.data());
+  });
+  return users;
+}
+
+function logout() {
+  return signOut(auth)
+}
+
+export { getUser, getAds, postAd, loggin, registered, logout };
